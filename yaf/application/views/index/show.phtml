@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+
+<!--i.新闻标题-->
+<!--ii.新闻图片-->
+<!--iii.新闻简介-->
+<!--iv.新闻内容-->
+<!--v.排序-->
+<!--vi.是否推荐-->
+<!--vii.是否显示-->
+      <center>
+          <input type="text" id="sousuo" value=""><button class="fy" id="ss" ids="1">搜索</button>
+          <table border="1">
+              <tr>
+                  <td>ID</td>
+                  <td>新闻标题</td>
+                  <td>新闻图片</td>
+                  <td>新闻简介</td>
+                  <td>新闻内容</td>
+                  <td>排序</td>
+                  <td>是否推荐</td>
+                  <td>是否显示</td>
+                  <td>操作</td>
+              </tr>
+
+              <tbody id="tbody">
+              <?php foreach ($content['data'] as $k=>$v):?>
+                  <tr>
+                      <td ><?= $v['id']?></td>
+                      <td class="xg" name="title"><?= $v['title']?></td>
+                      <td><img src="/public/<?php echo $v['img']?>" style="width:50px;height:50px;"></td>
+                      <td class="xg" name="info"><?= $v['info']?></td>
+                      <td class="xg" name="content"><?= $v['content']?></td>
+                      <td><?= $v['sort']?></td>
+                      <td><?= $v['istuijian']?></td>
+                      <td><?= $v['isshow']?></td>
+                      <td><a href="javascript:void(0)" class="del" ids="<?php echo $v['id']?>">删除</a></td>
+                  </tr>
+              <?php endforeach;?>
+              </tbody>
+
+          </table>
+          <button class="fy" id="shouye" ids="1">首页</button>
+
+          <button class="fy" id="up" ids="<?php echo $content['up']?>">上一页</button>
+
+          <input type="hidden" id="page" value="<?php echo $content['page']?>">
+
+          <button class="fy" id="down" ids="<?php echo $content['next']?>">下一页</button>
+
+          <button class="fy" id="wy" ids="<?php echo $content['wy']?>">尾页</button>
+      </center>
+</body>
+</html>
+<script src="/public/js/jquery.js"></script>
+<script>
+    //删除
+//   $(document).on('click','.del',function () {
+//        var id=$(this).parent().prev().prev().prev().prev().prev().prev().prev().prev().html()
+//       $.ajax({
+//           type:"post",
+//           data:{id:id},
+//           url:"del",
+//           success:function (msg) {
+//               console.log(msg)
+//           }
+//       })
+//   })\
+    //即点即改
+   //ajax分页
+   $('.fy').click(function () {
+     var sousuo=$('#sousuo').val()
+     var page = $(this).attr('ids');
+     var max = $('#wy').attr('ids');
+     if(page<1){
+         alert('已经是第一页了');
+         return false;
+     }
+       if(page>max){
+           alert('已经是最后一页了');
+           return false;
+       }
+       $.ajax({
+           dataType:"json",
+           type:"post",
+           data:{page:page,sousuo:sousuo},
+           url:"show",
+           success:function (msg) {
+               console.log(msg)
+               var str = ""
+               $.each(msg.data,function (k,v) {
+                   str+="<tr><td>"+v.id+"</td>";
+                   str+="<td>"+v.title+"</td>";
+                   str+="<td><img src='/public/"+v.img+"' width='50px' height='50px'></td>";
+                   str+="<td>"+v.info+"</td>";
+                   str+="<td>"+v.content+"</td>";
+                   str+="<td>"+v.sort+"</td>";
+                   str+="<td>"+v.istuijian+"</td>";
+                   str+="<td>"+v.isshow+"</td>";
+                   str+="<td><a href='javascript:void(0)' class='del' ids='"+v.id+"'>删除</a></td></tr>";
+               })
+               $("#tbody").html(str);
+               $("#up").attr('ids',msg.up);
+               $("#down").attr('ids',msg.next);
+               $("#wy").attr('ids',msg.wy);
+               $("#page").val(msg.page);
+           }
+       })
+   })
+    //删除
+    $(document).on('click','.del',function () {
+        var id = $(this).attr('ids');
+        $.ajax({
+            type:"post",
+            data:{id:id},
+            url:"del",
+            success:function (msg) {
+                if(msg==1){
+                    var sousuo = $("#sousuo").val();
+                    var page = $("#page").val();
+                    $.ajax({
+                        dataType:"json",
+                        type:"post",
+                        data:{page:page,sousuo:sousuo},
+                        url:"show",
+                        success:function (msg) {
+                            var str = ""
+                            $.each(msg.data,function (k,v) {
+                                str+="<tr><td>"+v.id+"</td>";
+                                str+="<td>"+v.title+"</td>";
+                                str+="<td><img src='/public/"+v.img+"' width='50px' height='50px'></td>";
+                                str+="<td>"+v.info+"</td>";
+                                str+="<td>"+v.content+"</td>";
+                                str+="<td>"+v.sort+"</td>";
+                                str+="<td>"+v.istuijian+"</td>";
+                                str+="<td>"+v.isshow+"</td>";
+                                str+="<td><a href='javascript:void(0)' class='del' ids='"+v.id+"'>删除</a></td></tr>";
+                            })
+                            $("#tbody").html(str);
+                            $("#up").attr('ids',msg.up);
+                            $("#down").attr('ids',msg.down);
+                            $("#wy").attr('ids',msg.wy);
+                            $("#page").val(msg.page);
+                        }
+                    })
+                }else{
+                    alert('删除失败')
+                }
+            }
+        })
+    })
+
+    //改
+    $(document).on('click','.xg',function () {
+        var value = $(this).html();
+        var name = $(this).attr('name');
+        $(this).prop('class','xg1');
+        $(this).html("<input class='xgk' type='text' id='"+name+"' value='"+value+"'>");
+    })
+    $(document).on('blur','.xgk',function () {
+        var value = $(this).val();
+        var name = $(this).prop('id');
+        var id = $(this).parent().parent().children().eq(0).html();
+        var obj = $(this)
+        $.ajax({
+            type:"post",
+            data:{name:name,value:value,id:id},
+            url:"update",
+            success:function (msg) {
+                if(msg==1){
+                    obj.parent().html(value);
+                    obj.parent().prop('class','xg');
+                }else{
+                    alert('修改失败');
+                    obj.parent().html(value);
+                    obj.parent().prop('class','xg');
+                }
+            }
+        })
+    })
+</script>

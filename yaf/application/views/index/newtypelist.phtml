@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+  <center>
+      <table border="1">
+          <tr>
+              <td>id</td>
+              <td>分类名称</td>
+              <td>排序</td>
+              <td>是否显示</td>
+              <td>创建时间</td>
+              <td>操作</td>
+          </tr>
+          <?php foreach ($arr as $k=>$v):?>
+               <tr>
+                   <td><?= $v['type_id']?></td>
+                   <td><?= $v['type_name']?></td>
+                   <td><?= $v['sort']?></td>
+                   <td><?= $v['isshow']?></td>
+                   <td><?= $v['time']?></td>
+                   <td>
+                       <a href="dele?id=<?php echo $v['type_id']?>">删除</a>|
+                       <a href="update?id=<?php echo $v['type_id']?>">修改</a>
+                   </td>
+
+               </tr>
+          <?php endforeach;?>
+      </table>
+  </center>
+</body>
+</html>
